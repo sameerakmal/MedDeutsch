@@ -14,3 +14,10 @@ export interface NavItem {
   path: string;
   icon: string; // Lucide icon name
 }
+
+export type {
+  VocabularyCategory,
+  GermanArticle,
+  VocabularyItem,
+  CategoryInfo,
+} from "./vocabulary";
