@@ -6,6 +6,11 @@ import {
   type ReviewStats,
   REVIEW_THRESHOLDS,
 } from "../types/mistake";
+import type {
+  LearnerProgress,
+  RecentActivityItem,
+  ActivityType,
+} from "../types/progress";
 
 /**
  * Storage key for persisting mistake records.
@@ -18,6 +23,29 @@ export const STORAGE_KEY_MISTAKES = "meddeutsch_mistakes_v1";
  * Allows components in the same window to re-render reactively.
  */
 export const MISTAKES_UPDATED_EVENT = "meddeutsch:mistakes_updated";
+
+/**
+ * Storage key for persisting aggregate learner progress.
+ */
+export const STORAGE_KEY_PROGRESS = "meddeutsch_progress_v1";
+
+/**
+ * Custom event name dispatched when progress storage updates.
+ */
+export const PROGRESS_UPDATED_EVENT = "meddeutsch:progress_updated";
+
+/**
+ * Default learner progress state for first-time or clean-slate learners.
+ */
+export const DEFAULT_LEARNER_PROGRESS: LearnerProgress = {
+  totalQuestionsAttempted: 0,
+  totalCorrectAnswers: 0,
+  totalPracticeSessions: 0,
+  wordsStudied: [],
+  recentActivity: [],
+  lastActivityAt: null,
+};
+
 
 /**
  * Checks if browser localStorage is available and writable.
@@ -258,14 +286,303 @@ export function clearMistake(itemId: string): void {
 }
 
 /**
- * Resets all mistake records from storage.
+ * Retrieves the aggregate learner progress from localStorage.
+ * Defensive against missing keys, invalid JSON, or partial schemas.
+ */
+export function getLearnerProgress(): LearnerProgress {
+  if (!isLocalStorageAvailable()) {
+    return { ...DEFAULT_LEARNER_PROGRESS };
+  }
+
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY_PROGRESS);
+    if (!raw) {
+      return { ...DEFAULT_LEARNER_PROGRESS };
+    }
+
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      return { ...DEFAULT_LEARNER_PROGRESS };
+    }
+
+    const totalQuestionsAttempted =
+      typeof parsed.totalQuestionsAttempted === "number" &&
+      parsed.totalQuestionsAttempted >= 0
+        ? parsed.totalQuestionsAttempted
+        : 0;
+
+    const totalCorrectAnswers =
+      typeof parsed.totalCorrectAnswers === "number" &&
+      parsed.totalCorrectAnswers >= 0
+        ? parsed.totalCorrectAnswers
+        : 0;
+
+    const totalPracticeSessions =
+      typeof parsed.totalPracticeSessions === "number" &&
+      parsed.totalPracticeSessions >= 0
+        ? parsed.totalPracticeSessions
+        : 0;
+
+    const wordsStudied: string[] = Array.isArray(parsed.wordsStudied)
+      ? Array.from<string>(
+          new Set<string>(
+            parsed.wordsStudied.filter(
+              (id: unknown): id is string =>
+                typeof id === "string" && id.trim() !== ""
+            )
+          )
+        )
+      : [];
+
+    const recentActivity: RecentActivityItem[] = Array.isArray(
+      parsed.recentActivity
+    )
+      ? parsed.recentActivity
+          .filter(
+            (act: unknown): act is RecentActivityItem =>
+              Boolean(
+                act &&
+                  typeof act === "object" &&
+                  typeof (act as RecentActivityItem).id === "string" &&
+                  typeof (act as RecentActivityItem).type === "string" &&
+                  typeof (act as RecentActivityItem).description === "string" &&
+                  typeof (act as RecentActivityItem).timestamp === "number"
+              )
+          )
+          .slice(0, 10)
+      : [];
+
+    const lastActivityAt =
+      typeof parsed.lastActivityAt === "number" ? parsed.lastActivityAt : null;
+
+    return {
+      totalQuestionsAttempted,
+      totalCorrectAnswers,
+      totalPracticeSessions,
+      wordsStudied,
+      recentActivity,
+      lastActivityAt,
+    };
+  } catch (error) {
+    console.error("Failed to parse learner progress from localStorage:", error);
+    return { ...DEFAULT_LEARNER_PROGRESS };
+  }
+}
+
+/**
+ * Persists learner progress into localStorage and broadcasts an update event.
+ */
+export function saveLearnerProgress(progress: LearnerProgress): void {
+  if (!isLocalStorageAvailable()) return;
+
+  try {
+    window.localStorage.setItem(
+      STORAGE_KEY_PROGRESS,
+      JSON.stringify(progress)
+    );
+    window.dispatchEvent(new CustomEvent(PROGRESS_UPDATED_EVENT));
+  } catch (error) {
+    console.error("Failed to save learner progress to localStorage:", error);
+  }
+}
+
+/**
+ * Records newly studied vocabulary item IDs.
+ * Deduplicates using a Set so repeatedly studying the same word never inflates the count.
+ */
+export function recordWordsStudied(itemIds: string[] | string): void {
+  const ids = Array.isArray(itemIds) ? itemIds : [itemIds];
+  if (ids.length === 0) return;
+
+  const current = getLearnerProgress();
+  const set = new Set<string>(current.wordsStudied);
+  let changed = false;
+
+  for (const id of ids) {
+    if (typeof id === "string" && id.trim() !== "" && !set.has(id)) {
+      set.add(id);
+      changed = true;
+    }
+  }
+
+  if (changed) {
+    const updated: LearnerProgress = {
+      ...current,
+      wordsStudied: Array.from<string>(set),
+      lastActivityAt: Date.now(),
+    };
+    saveLearnerProgress(updated);
+  }
+}
+
+
+/**
+ * Updates question attempt counts when a practice question is answered.
+ * Does not mutate mistake tracking (which is managed independently).
+ */
+export function recordPracticeAnswer(isCorrect: boolean): void {
+  const current = getLearnerProgress();
+  const updated: LearnerProgress = {
+    ...current,
+    totalQuestionsAttempted: current.totalQuestionsAttempted + 1,
+    totalCorrectAnswers: isCorrect
+      ? current.totalCorrectAnswers + 1
+      : current.totalCorrectAnswers,
+    lastActivityAt: Date.now(),
+  };
+  saveLearnerProgress(updated);
+}
+
+/**
+ * Appends a lightweight recent activity event, keeping at most 10 latest events.
+ */
+export function addRecentActivity(
+  type: ActivityType,
+  description: string
+): void {
+  const current = getLearnerProgress();
+  const now = Date.now();
+  const item: RecentActivityItem = {
+    id: `${now}-${Math.random().toString(36).slice(2, 7)}`,
+    type,
+    description,
+    timestamp: now,
+  };
+
+  const updated: LearnerProgress = {
+    ...current,
+    recentActivity: [item, ...current.recentActivity].slice(0, 10),
+    lastActivityAt: now,
+  };
+  saveLearnerProgress(updated);
+}
+
+/**
+ * Records a completed practice session and appends a recent activity entry.
+ */
+export function recordPracticeSessionCompleted(
+  correctCount: number,
+  totalQuestions: number,
+  topicLabel?: string
+): void {
+  const current = getLearnerProgress();
+  const now = Date.now();
+  const topicDesc = topicLabel ? ` (${topicLabel})` : "";
+  const activityItem: RecentActivityItem = {
+    id: `${now}-${Math.random().toString(36).slice(2, 7)}`,
+    type: "practice",
+    description: `Completed practice quiz${topicDesc} — ${correctCount}/${totalQuestions} correct`,
+    timestamp: now,
+  };
+
+  const updated: LearnerProgress = {
+    ...current,
+    totalPracticeSessions: current.totalPracticeSessions + 1,
+    recentActivity: [activityItem, ...current.recentActivity].slice(0, 10),
+    lastActivityAt: now,
+  };
+  saveLearnerProgress(updated);
+}
+
+/**
+ * Records a completed learning session and appends a recent activity entry.
+ */
+export function recordLearnSessionCompleted(
+  wordsCount: number,
+  topicLabel?: string
+): void {
+  const current = getLearnerProgress();
+  const now = Date.now();
+  const topicDesc = topicLabel ? ` (${topicLabel})` : "";
+  const activityItem: RecentActivityItem = {
+    id: `${now}-${Math.random().toString(36).slice(2, 7)}`,
+    type: "learn",
+    description: `Studied ${wordsCount} vocabulary terms${topicDesc}`,
+    timestamp: now,
+  };
+
+  const updated: LearnerProgress = {
+    ...current,
+    recentActivity: [activityItem, ...current.recentActivity].slice(0, 10),
+    lastActivityAt: now,
+  };
+  saveLearnerProgress(updated);
+}
+
+/**
+ * Records a completed review session and appends a recent activity entry.
+ */
+export function recordReviewSessionCompleted(
+  totalAnswered: number,
+  improvedCount: number
+): void {
+  const current = getLearnerProgress();
+  const now = Date.now();
+  const detail =
+    improvedCount > 0
+      ? ` — ${improvedCount} improved recall`
+      : "";
+  const activityItem: RecentActivityItem = {
+    id: `${now}-${Math.random().toString(36).slice(2, 7)}`,
+    type: "review",
+    description: `Reviewed ${totalAnswered} difficult term${
+      totalAnswered === 1 ? "" : "s"
+    }${detail}`,
+    timestamp: now,
+  };
+
+  const updated: LearnerProgress = {
+    ...current,
+    recentActivity: [activityItem, ...current.recentActivity].slice(0, 10),
+    lastActivityAt: now,
+  };
+  saveLearnerProgress(updated);
+}
+
+/**
+ * Calculates practice accuracy percentage (0-100).
+ * Handles zero-attempt cleanly by returning 0.
+ */
+export function calculateAccuracy(
+  correctCount: number,
+  attemptedCount: number
+): number {
+  if (attemptedCount <= 0) return 0;
+  return Math.round((correctCount / attemptedCount) * 100);
+}
+
+/**
+ * Formats a unix timestamp (ms) into a concise relative time string.
+ */
+export function formatRelativeTime(timestamp: number): string {
+  const now = Date.now();
+  const diffMs = Math.max(0, now - timestamp);
+  const diffSec = Math.floor(diffMs / 1000);
+  if (diffSec < 60) return "Just now";
+  const diffMin = Math.floor(diffSec / 60);
+  if (diffMin < 60) return `${diffMin}m ago`;
+  const diffHour = Math.floor(diffMin / 60);
+  if (diffHour < 24) return `${diffHour}h ago`;
+  const diffDay = Math.floor(diffHour / 24);
+  if (diffDay < 7) return `${diffDay}d ago`;
+  return new Date(timestamp).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+  });
+}
+
+/**
+ * Resets all learner data (mistakes and progress) from storage.
  */
 export function resetLearningData(): void {
   if (!isLocalStorageAvailable()) return;
   try {
     window.localStorage.removeItem(STORAGE_KEY_MISTAKES);
+    window.localStorage.removeItem(STORAGE_KEY_PROGRESS);
     window.dispatchEvent(new CustomEvent(MISTAKES_UPDATED_EVENT));
+    window.dispatchEvent(new CustomEvent(PROGRESS_UPDATED_EVENT));
   } catch (error) {
     console.error("Failed to reset learning data:", error);
   }
 }
+

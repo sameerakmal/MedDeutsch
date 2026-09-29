@@ -13,6 +13,9 @@ export {
 export {
   STORAGE_KEY_MISTAKES,
   MISTAKES_UPDATED_EVENT,
+  STORAGE_KEY_PROGRESS,
+  PROGRESS_UPDATED_EVENT,
+  DEFAULT_LEARNER_PROGRESS,
   computeReviewStatus,
   getMistakes,
   getMistakesList,
@@ -23,4 +26,15 @@ export {
   recordSuccessfulRecall,
   clearMistake,
   resetLearningData,
+  getLearnerProgress,
+  saveLearnerProgress,
+  recordWordsStudied,
+  recordPracticeAnswer,
+  addRecentActivity,
+  recordPracticeSessionCompleted,
+  recordLearnSessionCompleted,
+  recordReviewSessionCompleted,
+  calculateAccuracy,
+  formatRelativeTime,
 } from "./storage";
+

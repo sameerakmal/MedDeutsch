@@ -1,16 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import type {
   CEFRLevel,
   VocabularyCategory,
   VocabularyItem,
 } from "../types/vocabulary";
+import { categories } from "../data/categories";
 import {
   LearningSetup,
   LearningSession,
   LearningComplete,
 } from "../components/learn";
 import { useSpeechSynthesis } from "../hooks";
+import { recordWordsStudied, recordLearnSessionCompleted } from "../utils";
+
 
 type ViewMode = "setup" | "session" | "complete";
 
@@ -55,6 +58,13 @@ export function LearnPage() {
     stop,
   } = useSpeechSynthesis();
 
+  // Automatically record each vocabulary item presented during an active learning session
+  useEffect(() => {
+    if (viewMode === "session" && sessionItems[currentIndex]) {
+      recordWordsStudied(sessionItems[currentIndex].id);
+    }
+  }, [viewMode, sessionItems, currentIndex]);
+
   // Handler to start a new learning session
   const handleStartSession = (
     level: CEFRLevel,
@@ -75,9 +85,20 @@ export function LearnPage() {
     if (currentIndex < sessionItems.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     } else {
+      const categoryLabel =
+        currentCategory === "all"
+          ? "All Topics"
+          : categories.find((c) => c.id === currentCategory)?.label ??
+            currentCategory;
+
+      recordLearnSessionCompleted(
+        sessionItems.length,
+        `${currentLevel} ${categoryLabel}`
+      );
       setViewMode("complete");
     }
   };
+
 
   // Move to previous word
   const handlePrevWord = () => {

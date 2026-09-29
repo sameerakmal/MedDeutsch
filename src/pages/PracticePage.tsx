@@ -11,13 +11,17 @@ import {
   PracticeSession,
   PracticeComplete,
 } from "../components/practice";
+import { categories } from "../data/categories";
 import {
   createPracticeSession,
   calculatePracticeResult,
   recordMistake,
   recordSuccessfulRecall,
+  recordPracticeAnswer,
+  recordPracticeSessionCompleted,
 } from "../utils";
 import { useSpeechSynthesis } from "../hooks";
+
 
 type ViewMode = "setup" | "session" | "complete";
 
@@ -72,6 +76,8 @@ export function PracticePage() {
     isCorrect: boolean
   ) => {
     if (!session) return;
+    // Guard against duplicate answer recording on re-renders or repeated submits
+    if (session.answers[questionId]) return;
 
     const currentQuestion = session.questions.find((q) => q.id === questionId);
     if (currentQuestion) {
@@ -92,6 +98,9 @@ export function PracticePage() {
         recordSuccessfulRecall(currentQuestion.targetItem.id);
       }
     }
+
+    // Record persistent practice answer
+    recordPracticeAnswer(isCorrect);
 
     setSession((prev) => {
       if (!prev) return prev;
@@ -124,6 +133,21 @@ export function PracticePage() {
         };
       });
     } else {
+      // Calculate correct answers from completed session
+      const answersList = Object.values(session.answers);
+      const correctCount = answersList.filter((a) => a.isCorrect).length;
+      const categoryLabel =
+        session.config.category === "all"
+          ? "All Topics"
+          : categories.find((c) => c.id === session.config.category)?.label ??
+            session.config.category;
+
+      recordPracticeSessionCompleted(
+        correctCount,
+        session.questions.length,
+        `${session.config.level} ${categoryLabel}`
+      );
+
       setSession((prev) => {
         if (!prev) return prev;
         return {
@@ -135,6 +159,7 @@ export function PracticePage() {
       setViewMode("complete");
     }
   };
+
 
   // Exit back to practice setup
   const handleExit = () => {

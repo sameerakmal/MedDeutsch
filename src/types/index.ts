@@ -39,3 +39,10 @@ export type {
   ReviewStats,
 } from "./mistake";
 export { REVIEW_THRESHOLDS } from "./mistake";
+
+export type {
+  ActivityType,
+  RecentActivityItem,
+  LearnerProgress,
+} from "./progress";
+

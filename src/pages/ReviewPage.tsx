@@ -5,6 +5,7 @@ import {
   getMistakesList,
   getReviewStats,
   clearMistake,
+  recordReviewSessionCompleted,
   MISTAKES_UPDATED_EVENT,
 } from "../utils/storage";
 import {
@@ -103,10 +104,18 @@ export function ReviewPage() {
   // Review session completed
   const handleSessionComplete = (result: ReviewSessionResult) => {
     stop();
+    const improvedCount = result.items.filter(
+      (i) =>
+        i.isCorrect &&
+        (i.newStatus === "improving" || i.newStatus === "mastered")
+    ).length;
+    recordReviewSessionCompleted(result.totalReviewed, improvedCount);
     setSessionResult(result);
     setViewMode("complete");
     refreshData();
   };
+
+
 
   // Exit back to list
   const handleExitToReviewList = () => {
