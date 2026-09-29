@@ -1,4 +1,5 @@
 import type { CEFRLevel } from "./index";
+export type { CEFRLevel };
 
 /**
  * Vocabulary categories covering beginner medical/nursing areas.
