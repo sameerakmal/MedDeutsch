@@ -71,7 +71,9 @@ export function LearningComplete({
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
           <Button
             size="lg"
-            onClick={() => navigate("/practice")}
+            onClick={() =>
+              navigate(`/practice?level=${level}&category=${category}`)
+            }
             className="w-full sm:w-auto shadow-sm"
           >
             <PenLine className="w-4 h-4 mr-1" aria-hidden="true" />

@@ -21,3 +21,14 @@ export type {
   VocabularyItem,
   CategoryInfo,
 } from "./vocabulary";
+
+export type {
+  QuestionType,
+  AnswerOption,
+  QuestionExplanation,
+  Question,
+  QuestionAnswer,
+  PracticeSessionConfig,
+  PracticeSession,
+  PracticeResult,
+} from "./practice";
