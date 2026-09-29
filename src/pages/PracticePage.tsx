@@ -11,7 +11,12 @@ import {
   PracticeSession,
   PracticeComplete,
 } from "../components/practice";
-import { createPracticeSession, calculatePracticeResult } from "../utils/quiz";
+import {
+  createPracticeSession,
+  calculatePracticeResult,
+  recordMistake,
+  recordSuccessfulRecall,
+} from "../utils";
 import { useSpeechSynthesis } from "../hooks";
 
 type ViewMode = "setup" | "session" | "complete";
@@ -60,13 +65,33 @@ export function PracticePage() {
     setViewMode("session");
   };
 
-  // Record answer for current question
+  // Record answer for current question and persist mistake or recall progress
   const handleAnswer = (
     questionId: string,
     selectedOptionId: string,
     isCorrect: boolean
   ) => {
     if (!session) return;
+
+    const currentQuestion = session.questions.find((q) => q.id === questionId);
+    if (currentQuestion) {
+      if (!isCorrect) {
+        const chosenOption = currentQuestion.options.find(
+          (o) => o.id === selectedOptionId
+        );
+        const correctOption = currentQuestion.options.find(
+          (o) => o.id === currentQuestion.correctOptionId
+        );
+        recordMistake(
+          currentQuestion.targetItem,
+          currentQuestion.type,
+          chosenOption?.text ?? "No answer",
+          correctOption?.text ?? currentQuestion.explanation.germanText
+        );
+      } else {
+        recordSuccessfulRecall(currentQuestion.targetItem.id);
+      }
+    }
 
     setSession((prev) => {
       if (!prev) return prev;

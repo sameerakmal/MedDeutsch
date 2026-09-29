@@ -32,3 +32,10 @@ export type {
   PracticeSession,
   PracticeResult,
 } from "./practice";
+
+export type {
+  ReviewStatus,
+  MistakeRecord,
+  ReviewStats,
+} from "./mistake";
+export { REVIEW_THRESHOLDS } from "./mistake";

@@ -1,30 +1,174 @@
-import { Card } from "../components";
-import { RotateCcw } from "lucide-react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import type { MistakeRecord, ReviewStatus } from "../types/mistake";
+import type { VocabularyItem } from "../types/vocabulary";
+import {
+  getMistakesList,
+  getReviewStats,
+  clearMistake,
+  MISTAKES_UPDATED_EVENT,
+} from "../utils/storage";
+import {
+  ReviewHeader,
+  ReviewList,
+  ReviewSession,
+  ReviewComplete,
+  type ReviewSessionResult,
+} from "../components/review";
+import { useSpeechSynthesis } from "../hooks";
+
+type ViewMode = "list" | "session" | "complete";
 
 export function ReviewPage() {
-  return (
-    <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Review</h1>
-        <p className="text-gray-500 mt-1">
-          Revisit vocabulary you need to practise more.
-        </p>
-      </div>
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
+  const [mistakes, setMistakes] = useState<MistakeRecord[]>(() =>
+    getMistakesList()
+  );
+  const [stats, setStats] = useState(() => getReviewStats());
+  const [filter, setFilter] = useState<"all" | ReviewStatus>("all");
+  const [activeReviewItems, setActiveReviewItems] = useState<VocabularyItem[]>(
+    []
+  );
+  const [sessionResult, setSessionResult] =
+    useState<ReviewSessionResult | null>(null);
 
-      <Card>
-        <div className="flex flex-col items-center py-8 text-center">
-          <div className="w-12 h-12 rounded-xl bg-primary-100 flex items-center justify-center mb-4">
-            <RotateCcw className="w-6 h-6 text-primary-600" aria-hidden="true" />
-          </div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-1">
-            Nothing to review yet
-          </h2>
-          <p className="text-sm text-gray-500 max-w-sm">
-            Words you get wrong during practice will be collected here for
-            focused review.
-          </p>
+  // Speech synthesis
+  const {
+    isSupported: speechSupported,
+    isSpeaking,
+    currentText: speakingText,
+    speak,
+    stop,
+  } = useSpeechSynthesis();
+
+  // Reload state from storage
+  const refreshData = useCallback(() => {
+    setMistakes(getMistakesList());
+    setStats(getReviewStats());
+  }, []);
+
+  // Listen for storage updates across components
+  useEffect(() => {
+    const handleStorageUpdate = () => {
+      refreshData();
+    };
+
+    window.addEventListener(MISTAKES_UPDATED_EVENT, handleStorageUpdate);
+    return () => {
+      window.removeEventListener(MISTAKES_UPDATED_EVENT, handleStorageUpdate);
+    };
+  }, [refreshData]);
+
+  // Filtered items
+  const filteredItems = useMemo(() => {
+    if (filter === "all") return mistakes;
+    return mistakes.filter((m) => m.status === filter);
+  }, [mistakes, filter]);
+
+  // Start a review session
+  const handleStartReviewSession = (explicitItems?: VocabularyItem[]) => {
+    stop();
+    if (explicitItems && explicitItems.length > 0) {
+      setActiveReviewItems(explicitItems);
+      setViewMode("session");
+      return;
+    }
+
+    // Prioritise items that need review; if none, use improving items
+    const needsReviewItems = mistakes.filter((m) => m.status === "needsReview");
+    const candidates =
+      needsReviewItems.length > 0
+        ? needsReviewItems
+        : mistakes.filter((m) => m.status === "improving");
+
+    // Take up to 10 items for a focused review drill
+    const selected = candidates.slice(0, 10).map((m) => m.vocabularyItem);
+
+    if (selected.length === 0) return;
+
+    setActiveReviewItems(selected);
+    setViewMode("session");
+  };
+
+  // Review a single specific item from its card
+  const handleReviewSingle = (record: MistakeRecord) => {
+    handleStartReviewSession([record.vocabularyItem]);
+  };
+
+  // Remove a mistake item
+  const handleRemoveItem = (itemId: string) => {
+    clearMistake(itemId);
+    refreshData();
+  };
+
+  // Review session completed
+  const handleSessionComplete = (result: ReviewSessionResult) => {
+    stop();
+    setSessionResult(result);
+    setViewMode("complete");
+    refreshData();
+  };
+
+  // Exit back to list
+  const handleExitToReviewList = () => {
+    stop();
+    setViewMode("list");
+    refreshData();
+  };
+
+  // Check if more items need review for the "Review Again" CTA
+  const remainingNeedsReview = mistakes.some((m) => m.status === "needsReview");
+
+  return (
+    <div className="py-2">
+      {/* 1. Review List Dashboard */}
+      {viewMode === "list" && (
+        <div className="space-y-6">
+          <ReviewHeader
+            stats={stats}
+            currentFilter={filter}
+            onFilterChange={setFilter}
+            onStartReview={() => handleStartReviewSession()}
+          />
+
+          <ReviewList
+            items={filteredItems}
+            totalTrackedCount={stats.total}
+            currentFilter={filter}
+            onFilterReset={() => setFilter("all")}
+            onSpeak={speak}
+            isSpeaking={isSpeaking}
+            speakingText={speakingText}
+            speechSupported={speechSupported}
+            onRemoveItem={handleRemoveItem}
+            onReviewSingle={handleReviewSingle}
+          />
         </div>
-      </Card>
+      )}
+
+      {/* 2. Active Review Session */}
+      {viewMode === "session" && activeReviewItems.length > 0 && (
+        <ReviewSession
+          targetItems={activeReviewItems}
+          onComplete={handleSessionComplete}
+          onExit={handleExitToReviewList}
+          onSpeak={speak}
+          isSpeaking={isSpeaking}
+          speakingText={speakingText}
+          speechSupported={speechSupported}
+        />
+      )}
+
+      {/* 3. Review Session Complete Summary */}
+      {viewMode === "complete" && sessionResult && (
+        <ReviewComplete
+          result={sessionResult}
+          onReviewAgain={() => handleStartReviewSession()}
+          onBackToList={handleExitToReviewList}
+          onSpeak={speak}
+          speechSupported={speechSupported}
+          hasMoreToReview={remainingNeedsReview}
+        />
+      )}
     </div>
   );
 }

@@ -179,7 +179,7 @@ function createExplanation(
 /**
  * Constructs a single Question from a target item and question type.
  */
-function buildQuestion(
+export function buildQuestion(
   targetItem: VocabularyItem,
   type: QuestionType,
   index: number
@@ -334,6 +334,31 @@ export function generateQuestions(config: PracticeSessionConfig): Question[] {
     let desiredType = typeCycle[index % typeCycle.length];
 
     // If sentence completion is not viable for this item, fallback to translation
+    if (
+      desiredType === "sentenceCompletion" &&
+      !canGenerateSentenceCompletion(item)
+    ) {
+      desiredType = index % 2 === 0 ? "germanToEnglish" : "englishToGerman";
+    }
+
+    return buildQuestion(item, desiredType, index);
+  });
+}
+
+/**
+ * Generates active recall questions for an explicit list of vocabulary items (e.g. for review sessions).
+ * Cycles through question formats while ensuring sentence completion has viable context.
+ */
+export function generateReviewQuestions(items: VocabularyItem[]): Question[] {
+  const typeCycle: QuestionType[] = [
+    "germanToEnglish",
+    "englishToGerman",
+    "sentenceCompletion",
+  ];
+
+  return items.map((item, index) => {
+    let desiredType = typeCycle[index % typeCycle.length];
+
     if (
       desiredType === "sentenceCompletion" &&
       !canGenerateSentenceCompletion(item)
