@@ -52,7 +52,6 @@ export function LearningSession({
   // Keyboard navigation support: Left / Right arrows, Space to speak
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't trigger if user is interacting with form inputs or buttons
       if (
         document.activeElement?.tagName === "INPUT" ||
         document.activeElement?.tagName === "TEXTAREA" ||
@@ -94,7 +93,7 @@ export function LearningSession({
             type="button"
             onClick={onExit}
             aria-label="Exit learning session"
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" aria-hidden="true" />
             <span>Exit</span>
@@ -102,11 +101,11 @@ export function LearningSession({
 
           {/* Level & Category Info */}
           <div className="flex items-center gap-1.5 flex-wrap justify-end">
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">
-              <CategoryIcon name={categoryIconName} className="w-3.5 h-3.5" />
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-white border border-slate-200 text-slate-700">
+              <CategoryIcon name={categoryIconName} className="w-3.5 h-3.5 text-slate-500" />
               <span>{categoryLabel}</span>
             </span>
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-primary-50 text-primary-700 border border-primary-200">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-primary-50 text-primary-800 border border-primary-200">
               {level}
             </span>
           </div>
@@ -114,11 +113,11 @@ export function LearningSession({
 
         {/* Progress Bar & Word Counter */}
         <div>
-          <div className="flex items-center justify-between text-xs font-semibold text-gray-500 mb-1.5">
+          <div className="flex items-center justify-between text-xs font-bold text-slate-500 mb-1.5">
             <span role="status" aria-live="polite">
               Word {currentIndex + 1} of {total}
             </span>
-            <span className="tabular-nums">
+            <span className="tabular-nums font-semibold">
               {Math.round(progressPercent)}%
             </span>
           </div>
@@ -150,12 +149,12 @@ export function LearningSession({
             aria-label="Previous word"
           >
             <ArrowLeft className="w-4 h-4 mr-1" aria-hidden="true" />
-            Previous
+            <span>Previous</span>
           </Button>
 
           {/* Indicator text */}
           <div className="text-center hidden sm:block">
-            <span className="text-xs font-medium text-gray-400">
+            <span className="text-xs font-semibold text-slate-400">
               {currentIndex + 1} / {total}
             </span>
           </div>
@@ -170,21 +169,21 @@ export function LearningSession({
           >
             {isLastWord ? (
               <>
-                Finish
+                <span>Finish</span>
                 <Check className="w-4 h-4 ml-1" aria-hidden="true" />
               </>
             ) : (
               <>
-                Next
+                <span>Next</span>
                 <ArrowRight className="w-4 h-4 ml-1" aria-hidden="true" />
               </>
             )}
           </Button>
         </div>
 
-        {/* Accessible Keyboard Shortcut Hint */}
-        <p className="text-center text-xs text-gray-400 mt-4 select-none">
-          Tip: Use <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-200 rounded text-gray-600 font-mono text-[11px]">←</kbd> / <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-200 rounded text-gray-600 font-mono text-[11px]">→</kbd> to navigate, and <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-200 rounded text-gray-600 font-mono text-[11px]">Space</kbd> to listen.
+        {/* Accessible Keyboard Shortcut Hint (Desktop only) */}
+        <p className="text-center text-xs text-slate-400 mt-4 select-none hidden sm:block">
+          Tip: Keyboard <kbd className="px-1.5 py-0.5 bg-white border border-slate-200 rounded text-slate-700 font-mono text-[11px]">←</kbd> / <kbd className="px-1.5 py-0.5 bg-white border border-slate-200 rounded text-slate-700 font-mono text-[11px]">→</kbd> to navigate, <kbd className="px-1.5 py-0.5 bg-white border border-slate-200 rounded text-slate-700 font-mono text-[11px]">Space</kbd> to listen.
         </p>
       </nav>
     </div>

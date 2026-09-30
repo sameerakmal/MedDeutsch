@@ -6,7 +6,6 @@ import {
   BarChart3,
   RotateCcw,
   TrendingUp,
-  Menu,
   X,
 } from "lucide-react";
 import { useState, useEffect, type ReactNode } from "react";
@@ -19,12 +18,12 @@ interface NavEntry {
 }
 
 const navigation: NavEntry[] = [
-  { label: "Dashboard", path: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
-  { label: "Learn", path: "/learn", icon: <BookOpen className="w-5 h-5" /> },
-  { label: "Practice", path: "/practice", icon: <PenLine className="w-5 h-5" /> },
-  { label: "Review", path: "/review", icon: <RotateCcw className="w-5 h-5" /> },
-  { label: "Results", path: "/results", icon: <BarChart3 className="w-5 h-5" /> },
-  { label: "Progress", path: "/progress", icon: <TrendingUp className="w-5 h-5" /> },
+  { label: "Dashboard", path: "/dashboard", icon: <LayoutDashboard className="w-4 h-4" /> },
+  { label: "Learn", path: "/learn", icon: <BookOpen className="w-4 h-4" /> },
+  { label: "Practice", path: "/practice", icon: <PenLine className="w-4 h-4" /> },
+  { label: "Review", path: "/review", icon: <RotateCcw className="w-4 h-4" /> },
+  { label: "Results", path: "/results", icon: <BarChart3 className="w-4 h-4" /> },
+  { label: "Progress", path: "/progress", icon: <TrendingUp className="w-4 h-4" /> },
 ];
 
 interface AppLayoutProps {
@@ -46,51 +45,65 @@ export function AppLayout({ children }: AppLayoutProps) {
   }, [mobileNavOpen]);
 
   return (
-    <div className="flex flex-col h-screen">
-      <Header />
+    <div className="flex flex-col h-screen bg-surface">
+      <Header
+        onMenuClick={() => setMobileNavOpen((prev) => !prev)}
+        mobileNavOpen={mobileNavOpen}
+      />
 
       <div className="flex flex-1 overflow-hidden">
         {/* Desktop sidebar */}
         <nav
           aria-label="Main navigation"
-          className="hidden md:flex flex-col w-56 border-r border-gray-200 bg-white py-4 shrink-0"
+          className="hidden md:flex flex-col w-60 border-r border-slate-200 bg-white py-5 shrink-0"
         >
+          <div className="px-4 mb-3">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+              Navigation
+            </span>
+          </div>
           <NavList onClick={() => {}} />
         </nav>
 
-        {/* Mobile nav toggle */}
-        <button
-          type="button"
-          aria-label={mobileNavOpen ? "Close navigation menu" : "Open navigation menu"}
-          aria-expanded={mobileNavOpen}
-          aria-controls="mobile-navigation"
-          className="md:hidden fixed bottom-4 right-4 z-50 bg-primary-600 text-white p-3 rounded-full shadow-lg hover:bg-primary-700 transition-colors"
-          onClick={() => setMobileNavOpen((prev) => !prev)}
-        >
-          {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
-
-        {/* Mobile overlay */}
+        {/* Mobile drawer overlay */}
         {mobileNavOpen && (
-          <>
+          <div className="md:hidden fixed inset-0 z-50 flex">
+            {/* Backdrop */}
             <div
-              className="md:hidden fixed inset-0 bg-black/30 z-40"
+              className="fixed inset-0 bg-slate-900/30 transition-opacity"
               onClick={() => setMobileNavOpen(false)}
               aria-hidden="true"
             />
+
+            {/* Drawer */}
             <nav
               id="mobile-navigation"
               aria-label="Mobile navigation"
-              className="md:hidden fixed inset-y-0 left-0 w-64 bg-white z-50 shadow-xl py-4 pt-20"
+              className="relative flex flex-col w-72 max-w-[85vw] bg-white h-full shadow-lg border-r border-slate-200 p-5 z-10"
             >
+              <div className="flex items-center justify-between pb-4 mb-2 border-b border-slate-100">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  Menu
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="p-1 rounded-md text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+                  aria-label="Close menu"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
               <NavList onClick={() => setMobileNavOpen(false)} />
             </nav>
-          </>
+          </div>
         )}
 
-        {/* Main content */}
+        {/* Main content container */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-          {children}
+          <div className="max-w-5xl mx-auto w-full">
+            {children}
+          </div>
         </main>
       </div>
     </div>
@@ -106,10 +119,10 @@ function NavList({ onClick }: { onClick: () => void }) {
             to={item.path}
             onClick={onClick}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
                 isActive
-                  ? "bg-primary-50 text-primary-700"
-                  : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  ? "bg-primary-50 text-primary-800 font-semibold border border-primary-200/70"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`
             }
           >

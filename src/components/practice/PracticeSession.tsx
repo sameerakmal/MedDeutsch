@@ -54,7 +54,7 @@ export function PracticeSession({
 
   const categoryLabel =
     config.category === "all"
-      ? "All Topics"
+      ? "All Categories"
       : categories.find((c) => c.id === config.category)?.label ??
         config.category;
 
@@ -88,7 +88,7 @@ export function PracticeSession({
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6">
       {/* Top Session Navigation & Progress */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
@@ -96,16 +96,16 @@ export function PracticeSession({
           <button
             type="button"
             onClick={onExit}
-            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
             aria-label="Exit practice session and return to setup"
           >
             <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-            <span>Exit Practice</span>
+            <span>Exit</span>
           </button>
 
           {/* Level & Category Info */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary-50 text-primary-800 border border-primary-100">
-            <CategoryIcon name={categoryIconName} className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-white border border-slate-200 text-slate-700">
+            <CategoryIcon name={categoryIconName} className="w-3.5 h-3.5 text-slate-500" />
             <span>{config.level}</span>
             <span>•</span>
             <span className="truncate max-w-[150px] sm:max-w-none">
@@ -114,7 +114,7 @@ export function PracticeSession({
           </div>
 
           {/* Question Counter */}
-          <span className="text-xs sm:text-sm font-bold text-gray-700 tabular-nums">
+          <span className="text-xs sm:text-sm font-bold text-slate-700 tabular-nums">
             {currentIndex + 1} / {totalQuestions}
           </span>
         </div>

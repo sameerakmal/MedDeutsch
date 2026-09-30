@@ -108,7 +108,6 @@ export function ReviewSession({
       if (recalled) {
         updatedRecord = recalled;
       } else {
-        // Fallback safety if item was missing
         updatedRecord = recordMistake(
           currentQuestion.targetItem,
           currentQuestion.type,
@@ -153,7 +152,6 @@ export function ReviewSession({
     if (!isLastQuestion) {
       setCurrentIndex((prev) => prev + 1);
     } else {
-      // Calculate final review result
       const correctCount = sessionSummary.filter((s) => s.isCorrect).length;
       const incorrectCount = sessionSummary.length - correctCount;
       const accuracy =
@@ -172,26 +170,26 @@ export function ReviewSession({
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6">
       {/* Top Header & Navigation */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <button
             type="button"
             onClick={onExit}
-            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
             aria-label="Exit review session"
           >
             <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-            <span>Exit Review</span>
+            <span>Exit</span>
           </button>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-900 border border-amber-200">
-            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-            <span>Active Recall Review</span>
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-white border border-slate-200 text-slate-700">
+            <Sparkles className="w-3.5 h-3.5 text-accent-700" />
+            <span>Active Recall Drill</span>
           </div>
 
-          <span className="text-xs sm:text-sm font-bold text-gray-700 tabular-nums">
+          <span className="text-xs sm:text-sm font-bold text-slate-700 tabular-nums">
             {currentIndex + 1} / {totalQuestions}
           </span>
         </div>
@@ -218,41 +216,45 @@ export function ReviewSession({
           {/* Status Progression Callout */}
           {currentSummaryItem && (
             <div
-              className={`p-3.5 rounded-xl border text-xs sm:text-sm font-medium flex items-center justify-between gap-3 ${
+              className={`p-3.5 rounded-xl border text-xs sm:text-sm font-semibold flex items-center justify-between gap-3 ${
                 currentSummaryItem.isCorrect
                   ? currentSummaryItem.newStatus === "mastered"
-                    ? "bg-emerald-100/80 border-emerald-300 text-emerald-950"
+                    ? "bg-success-50 border-success-200 text-success-900"
                     : currentSummaryItem.newStatus === "improving"
-                    ? "bg-primary-100/80 border-primary-300 text-primary-950"
-                    : "bg-emerald-50 border-emerald-200 text-emerald-900"
-                  : "bg-amber-100/80 border-amber-300 text-amber-950"
+                    ? "bg-primary-50 border-primary-200 text-primary-900"
+                    : "bg-success-50 border-success-200 text-success-900"
+                  : "bg-accent-50 border-accent-200 text-accent-900"
               }`}
             >
               <div className="flex items-center gap-2">
                 {currentSummaryItem.isCorrect ? (
                   currentSummaryItem.newStatus === "mastered" ? (
-                    <Trophy className="w-4 h-4 text-emerald-700 shrink-0" />
+                    <Trophy className="w-4 h-4 text-success-700 shrink-0" />
                   ) : currentSummaryItem.newStatus === "improving" ? (
                     <TrendingUp className="w-4 h-4 text-primary-700 shrink-0" />
                   ) : (
-                    <Sparkles className="w-4 h-4 text-emerald-700 shrink-0" />
+                    <Sparkles className="w-4 h-4 text-success-700 shrink-0" />
                   )
                 ) : (
-                  <AlertCircle className="w-4 h-4 text-amber-700 shrink-0" />
+                  <AlertCircle className="w-4 h-4 text-accent-700 shrink-0" />
                 )}
                 <span>
                   {currentSummaryItem.isCorrect
                     ? currentSummaryItem.newStatus === "mastered"
-                      ? "Mastery achieved! You successfully recalled this term 4+ times."
+                      ? "Mastery achieved! You have recalled this term 4+ times successfully."
                       : currentSummaryItem.newStatus === "improving"
-                      ? `Great recall! Moved to Improving (${currentSummaryItem.record.successfulRecallCount}/${REVIEW_THRESHOLDS.MASTERED_RECALL_COUNT} recalls).`
-                      : `Recall recorded (${currentSummaryItem.record.successfulRecallCount}/${REVIEW_THRESHOLDS.MASTERED_RECALL_COUNT} needed for mastery).`
-                    : "Keep going! This item stays in your review queue until recall improves."}
+                      ? `Improving! (${currentSummaryItem.record.successfulRecallCount}/${REVIEW_THRESHOLDS.MASTERED_RECALL_COUNT} successful recalls).`
+                      : `Successful recall (${currentSummaryItem.record.successfulRecallCount}/${REVIEW_THRESHOLDS.MASTERED_RECALL_COUNT} toward mastery).`
+                    : "Keep going! This term stays in review until mastered."}
                 </span>
               </div>
 
-              <span className="text-xs uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-white/70 border border-black/5 shrink-0">
-                {currentSummaryItem.newStatus}
+              <span className="text-[11px] font-bold tracking-wider px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-700 shrink-0">
+                {currentSummaryItem.newStatus === "needsReview"
+                  ? "Needs Review"
+                  : currentSummaryItem.newStatus === "improving"
+                  ? "Improving"
+                  : "Mastered"}
               </span>
             </div>
           )}

@@ -7,7 +7,6 @@ interface ReviewHeaderProps {
   currentFilter: "all" | ReviewStatus;
   onFilterChange: (filter: "all" | ReviewStatus) => void;
   onStartReview: () => void;
-  onResetData?: () => void;
 }
 
 export function ReviewHeader({
@@ -22,14 +21,13 @@ export function ReviewHeader({
   return (
     <div className="space-y-6">
       {/* Top Banner and Main Action */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 pb-5">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
-            Vocabulary Review
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            Review Difficult Terms
           </h1>
-          <p className="text-gray-500 text-sm mt-1 max-w-xl">
-            Active recall for clinical vocabulary you previously missed. Consistent
-            repetition turns tricky terms into instinctive recall.
+          <p className="text-slate-600 text-sm mt-1 max-w-xl">
+            Active recall for clinical vocabulary you previously missed. Consistent repetition turns difficult articles and medical terms into instinctive recall.
           </p>
         </div>
 
@@ -37,46 +35,46 @@ export function ReviewHeader({
           <Button
             size="lg"
             onClick={onStartReview}
-            className="shrink-0 shadow-md font-semibold cursor-pointer"
+            className="shrink-0 shadow-xs font-semibold cursor-pointer"
           >
             {stats.needsReview > 0 ? (
               <>
                 <Play className="w-4 h-4 mr-2 fill-current" aria-hidden="true" />
-                <span>Start Review ({stats.needsReview} {stats.needsReview === 1 ? "word" : "words"})</span>
+                <span>Start Review ({stats.needsReview} {stats.needsReview === 1 ? "term" : "terms"})</span>
               </>
             ) : (
               <>
                 <RotateCcw className="w-4 h-4 mr-2" aria-hidden="true" />
-                <span>Strengthen ({stats.improving} improving)</span>
+                <span>Review ({stats.improving} improving)</span>
               </>
             )}
           </Button>
         )}
       </div>
 
-      {/* Metric Cards Grid */}
+      {/* Metric Filter Tabs Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {/* Total Tracked */}
         <button
           type="button"
           onClick={() => onFilterChange("all")}
-          className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
+          className={`p-3.5 sm:p-4 rounded-xl border text-left transition-all cursor-pointer ${
             currentFilter === "all"
-              ? "bg-gray-50 border-gray-400 ring-2 ring-gray-200 shadow-xs"
-              : "bg-white border-gray-200 hover:border-gray-300"
+              ? "bg-slate-50 border-slate-400 ring-1 ring-slate-400 shadow-xs"
+              : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/50"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
-              Total Tracked
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+              Total
             </span>
-            <RotateCcw className="w-4 h-4 text-gray-400" aria-hidden="true" />
+            <RotateCcw className="w-3.5 h-3.5 text-slate-400" aria-hidden="true" />
           </div>
-          <div className="text-2xl font-extrabold text-gray-900 mt-1 tabular-nums">
+          <div className="text-2xl font-bold text-slate-900 mt-1 tabular-nums">
             {stats.total}
           </div>
-          <span className="text-xs text-gray-500 mt-0.5 block">
-            vocabulary items
+          <span className="text-xs text-slate-500 mt-0.5 block">
+            Terms tracked
           </span>
         </button>
 
@@ -84,23 +82,23 @@ export function ReviewHeader({
         <button
           type="button"
           onClick={() => onFilterChange("needsReview")}
-          className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
+          className={`p-3.5 sm:p-4 rounded-xl border text-left transition-all cursor-pointer ${
             currentFilter === "needsReview"
-              ? "bg-amber-50/70 border-amber-400 ring-2 ring-amber-200 shadow-xs"
-              : "bg-white border-gray-200 hover:border-amber-300"
+              ? "bg-accent-50/60 border-accent-600 ring-1 ring-accent-600 shadow-xs"
+              : "bg-white border-slate-200 hover:border-accent-300 hover:bg-accent-50/20"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-amber-800">
+            <span className="text-xs font-bold uppercase tracking-wider text-accent-800">
               Needs Review
             </span>
-            <AlertCircle className="w-4 h-4 text-amber-500" aria-hidden="true" />
+            <AlertCircle className="w-3.5 h-3.5 text-accent-700" aria-hidden="true" />
           </div>
-          <div className="text-2xl font-extrabold text-amber-700 mt-1 tabular-nums">
+          <div className="text-2xl font-bold text-accent-800 mt-1 tabular-nums">
             {stats.needsReview}
           </div>
-          <span className="text-xs text-amber-700 mt-0.5 block">
-            requires practice
+          <span className="text-xs text-accent-700 mt-0.5 block font-medium">
+            Priority (&lt; 2 recalls)
           </span>
         </button>
 
@@ -108,22 +106,22 @@ export function ReviewHeader({
         <button
           type="button"
           onClick={() => onFilterChange("improving")}
-          className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
+          className={`p-3.5 sm:p-4 rounded-xl border text-left transition-all cursor-pointer ${
             currentFilter === "improving"
-              ? "bg-primary-50/70 border-primary-400 ring-2 ring-primary-200 shadow-xs"
-              : "bg-white border-gray-200 hover:border-primary-300"
+              ? "bg-primary-50/60 border-primary-700 ring-1 ring-primary-700 shadow-xs"
+              : "bg-white border-slate-200 hover:border-primary-300 hover:bg-primary-50/20"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-primary-800">
+            <span className="text-xs font-bold uppercase tracking-wider text-primary-800">
               Improving
             </span>
-            <TrendingUp className="w-4 h-4 text-primary-500" aria-hidden="true" />
+            <TrendingUp className="w-3.5 h-3.5 text-primary-700" aria-hidden="true" />
           </div>
-          <div className="text-2xl font-extrabold text-primary-700 mt-1 tabular-nums">
+          <div className="text-2xl font-bold text-primary-800 mt-1 tabular-nums">
             {stats.improving}
           </div>
-          <span className="text-xs text-primary-700 mt-0.5 block">
+          <span className="text-xs text-primary-700 mt-0.5 block font-medium">
             2–3 successful recalls
           </span>
         </button>
@@ -132,72 +130,24 @@ export function ReviewHeader({
         <button
           type="button"
           onClick={() => onFilterChange("mastered")}
-          className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
+          className={`p-3.5 sm:p-4 rounded-xl border text-left transition-all cursor-pointer ${
             currentFilter === "mastered"
-              ? "bg-emerald-50/70 border-emerald-400 ring-2 ring-emerald-200 shadow-xs"
-              : "bg-white border-gray-200 hover:border-emerald-300"
+              ? "bg-success-50/60 border-success-600 ring-1 ring-success-600 shadow-xs"
+              : "bg-white border-slate-200 hover:border-success-300 hover:bg-success-50/20"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-emerald-800">
+            <span className="text-xs font-bold uppercase tracking-wider text-success-800">
               Mastered
             </span>
-            <Trophy className="w-4 h-4 text-emerald-500" aria-hidden="true" />
+            <Trophy className="w-3.5 h-3.5 text-success-700" aria-hidden="true" />
           </div>
-          <div className="text-2xl font-extrabold text-emerald-700 mt-1 tabular-nums">
+          <div className="text-2xl font-bold text-success-700 mt-1 tabular-nums">
             {stats.mastered}
           </div>
-          <span className="text-xs text-emerald-700 mt-0.5 block">
+          <span className="text-xs text-success-700 mt-0.5 block font-medium">
             4+ successful recalls
           </span>
-        </button>
-      </div>
-
-      {/* Filter Tabs */}
-      <div className="flex items-center gap-1.5 border-b border-gray-200 pb-2 overflow-x-auto text-xs sm:text-sm">
-        <button
-          type="button"
-          onClick={() => onFilterChange("all")}
-          className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer shrink-0 ${
-            currentFilter === "all"
-              ? "bg-gray-900 text-white"
-              : "text-gray-600 hover:bg-gray-100"
-          }`}
-        >
-          All Items ({stats.total})
-        </button>
-        <button
-          type="button"
-          onClick={() => onFilterChange("needsReview")}
-          className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer shrink-0 ${
-            currentFilter === "needsReview"
-              ? "bg-amber-600 text-white"
-              : "text-amber-800 hover:bg-amber-50"
-          }`}
-        >
-          Needs Review ({stats.needsReview})
-        </button>
-        <button
-          type="button"
-          onClick={() => onFilterChange("improving")}
-          className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer shrink-0 ${
-            currentFilter === "improving"
-              ? "bg-primary-600 text-white"
-              : "text-primary-800 hover:bg-primary-50"
-          }`}
-        >
-          Improving ({stats.improving})
-        </button>
-        <button
-          type="button"
-          onClick={() => onFilterChange("mastered")}
-          className={`px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer shrink-0 ${
-            currentFilter === "mastered"
-              ? "bg-emerald-600 text-white"
-              : "text-emerald-800 hover:bg-emerald-50"
-          }`}
-        >
-          Mastered ({stats.mastered})
         </button>
       </div>
     </div>

@@ -14,7 +14,7 @@ export function Card({
 }: CardProps) {
   return (
     <div
-      className={`bg-surface-card rounded-xl border border-gray-200 shadow-sm ${
+      className={`bg-white rounded-xl border border-slate-200 shadow-[0_1px_2px_rgba(0,0,0,0.03)] ${
         noPadding ? "" : "p-5 sm:p-6"
       } ${className}`}
       {...rest}

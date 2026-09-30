@@ -46,12 +46,9 @@ export function QuestionCard({
   const isAudioSpeaking =
     isSpeaking && promptGermanAudio && speakingText === promptGermanAudio;
 
-  // Keyboard shortcut support:
-  // Keys 1-4 or A-D select options before submission.
-  // Enter submits if an option is selected.
+  // Keyboard shortcut support: 1-4 or A-D select options before submission. Enter submits.
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't intercept if focus is inside an input or textarea
       if (
         document.activeElement?.tagName === "INPUT" ||
         document.activeElement?.tagName === "TEXTAREA"
@@ -97,11 +94,11 @@ export function QuestionCard({
   };
 
   return (
-    <Card className="p-6 sm:p-8 space-y-6">
+    <Card className="p-5 sm:p-7 space-y-5 border-slate-200">
       {/* Question Type Header & Pronunciation */}
-      <div className="flex items-center justify-between gap-3 border-b border-gray-100 pb-3">
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary-50 text-primary-800 border border-primary-200/60">
-          <HelpCircle className="w-3.5 h-3.5" aria-hidden="true" />
+      <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
+          <HelpCircle className="w-3.5 h-3.5 text-slate-500" aria-hidden="true" />
           <span>{getQuestionTypeLabel()}</span>
         </span>
 
@@ -110,10 +107,10 @@ export function QuestionCard({
             type="button"
             onClick={() => onSpeak(promptGermanAudio)}
             disabled={isSpeaking}
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold transition-colors cursor-pointer border ${
               isAudioSpeaking
-                ? "bg-primary-600 text-white animate-pulse"
-                : "text-primary-700 bg-primary-50 hover:bg-primary-100"
+                ? "bg-primary-700 text-white border-primary-700"
+                : "text-slate-700 bg-white border-slate-200 hover:bg-slate-50"
             }`}
             title="Listen to German pronunciation"
             aria-label="Listen to German pronunciation"
@@ -126,19 +123,19 @@ export function QuestionCard({
 
       {/* Question Prompt */}
       <div className="space-y-3">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 leading-snug">
+        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 leading-snug">
           {question.prompt}
         </h2>
 
         {/* Specialized display for Sentence Completion */}
         {question.type === "sentenceCompletion" && question.promptContext && (
-          <div className="p-4 sm:p-5 rounded-xl bg-slate-50 border border-slate-200">
-            <p className="text-lg sm:text-xl font-medium text-slate-900 font-serif tracking-wide">
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <p className="text-base sm:text-lg font-semibold text-slate-900 tracking-wide">
               {question.promptContext}
             </p>
             {question.promptContextTranslation && (
-              <p className="text-xs sm:text-sm text-slate-500 mt-2">
-                Context meaning: &ldquo;{question.promptContextTranslation}&rdquo;
+              <p className="text-xs sm:text-sm text-slate-500 mt-1.5">
+                Context: &ldquo;{question.promptContextTranslation}&rdquo;
               </p>
             )}
           </div>
@@ -149,7 +146,7 @@ export function QuestionCard({
       <div
         role="radiogroup"
         aria-label="Answer options"
-        className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2"
+        className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1"
       >
         {question.options.map((option, idx) => {
           const isSelected = selectedOptionId === option.id;
@@ -158,36 +155,32 @@ export function QuestionCard({
 
           // Styling logic for pre- and post-submission states
           let containerStyle =
-            "border-gray-200 bg-white hover:border-primary-400 hover:bg-gray-50/70";
-          let badgeStyle = "bg-gray-100 text-gray-700 border-gray-200";
+            "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50";
+          let badgeStyle = "bg-slate-100 text-slate-700 border-slate-200";
 
           if (!isSubmitted) {
             if (isSelected) {
               containerStyle =
-                "border-primary-600 bg-primary-50/70 ring-2 ring-primary-200 shadow-xs";
-              badgeStyle = "bg-primary-600 text-white border-primary-600";
+                "border-primary-700 bg-primary-50/40 ring-1 ring-primary-700 shadow-xs";
+              badgeStyle = "bg-primary-700 text-white border-primary-700";
             }
           } else {
             // Post-submission states
             if (isSelected && isCorrect) {
-              // Learner was correct
               containerStyle =
-                "border-emerald-600 bg-emerald-50 ring-2 ring-emerald-200 shadow-xs";
-              badgeStyle = "bg-emerald-600 text-white border-emerald-600";
+                "border-success-600 bg-success-50/50 ring-1 ring-success-600 shadow-xs";
+              badgeStyle = "bg-success-600 text-white border-success-600";
             } else if (isSelected && !isCorrect) {
-              // Learner was wrong
               containerStyle =
-                "border-rose-500 bg-rose-50 ring-2 ring-rose-200 shadow-xs";
-              badgeStyle = "bg-rose-600 text-white border-rose-600";
+                "border-error-600 bg-error-50/50 ring-1 ring-error-600 shadow-xs";
+              badgeStyle = "bg-error-600 text-white border-error-600";
             } else if (isCorrect) {
-              // The correct answer that user didn't pick
               containerStyle =
-                "border-emerald-500 bg-emerald-50/50 ring-1 ring-emerald-200";
-              badgeStyle = "bg-emerald-600 text-white border-emerald-600";
+                "border-success-600 bg-success-50/30 ring-1 ring-success-600/70";
+              badgeStyle = "bg-success-600 text-white border-success-600";
             } else {
-              // Other unselected options
-              containerStyle = "border-gray-200 bg-gray-50/50 opacity-40";
-              badgeStyle = "bg-gray-200 text-gray-500 border-gray-200";
+              containerStyle = "border-slate-200 bg-slate-50/50 opacity-50";
+              badgeStyle = "bg-slate-200 text-slate-500 border-slate-200";
             }
           }
 
@@ -199,18 +192,18 @@ export function QuestionCard({
               aria-checked={isSelected}
               disabled={isSubmitted}
               onClick={() => onSelectOption(option.id)}
-              className={`p-4 rounded-xl border-2 text-left transition-all flex items-start gap-3.5 relative cursor-pointer disabled:cursor-default ${containerStyle}`}
+              className={`p-3.5 sm:p-4 rounded-xl border text-left transition-all flex items-start gap-3 relative cursor-pointer min-h-[52px] disabled:cursor-default ${containerStyle}`}
             >
               {/* Option Key (A, B, C, D) */}
               <span
-                className={`w-7 h-7 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 border ${badgeStyle}`}
+                className={`w-6 h-6 rounded-md text-xs font-bold flex items-center justify-center shrink-0 border ${badgeStyle}`}
               >
                 {optionKey}
               </span>
 
               {/* Option Text */}
-              <div className="min-w-0 flex-1 pr-6">
-                <span className="text-base sm:text-lg font-medium text-gray-900 block break-words">
+              <div className="min-w-0 flex-1 pr-2">
+                <span className="text-sm sm:text-base font-semibold text-slate-900 block break-words">
                   {option.text}
                 </span>
 
@@ -218,19 +211,19 @@ export function QuestionCard({
                 {isSubmitted && (
                   <div className="mt-1 flex items-center gap-1.5 text-xs font-semibold">
                     {isSelected && isCorrect && (
-                      <span className="text-emerald-700 flex items-center gap-1">
+                      <span className="text-success-700 flex items-center gap-1">
                         <Check className="w-3.5 h-3.5" aria-hidden="true" />
                         Your answer • Correct
                       </span>
                     )}
                     {isSelected && !isCorrect && (
-                      <span className="text-rose-700 flex items-center gap-1">
+                      <span className="text-error-700 flex items-center gap-1">
                         <XCircle className="w-3.5 h-3.5" aria-hidden="true" />
                         Your answer • Incorrect
                       </span>
                     )}
                     {!isSelected && isCorrect && (
-                      <span className="text-emerald-700 flex items-center gap-1">
+                      <span className="text-success-700 flex items-center gap-1">
                         <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
                         Correct answer
                       </span>
@@ -239,30 +232,30 @@ export function QuestionCard({
                 )}
               </div>
 
-              {/* Radio indicator or feedback icon */}
+              {/* Status Indicator */}
               <div className="shrink-0 pt-0.5">
                 {!isSubmitted && (
                   <div
-                    className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${
+                    className={`w-4 h-4 rounded-full border flex items-center justify-center transition-colors ${
                       isSelected
-                        ? "border-primary-600 bg-primary-600 text-white"
-                        : "border-gray-300 bg-white"
+                        ? "border-primary-700 bg-primary-700 text-white"
+                        : "border-slate-300 bg-white"
                     }`}
                   >
                     {isSelected && (
-                      <div className="w-2 h-2 rounded-full bg-white" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-white" />
                     )}
                   </div>
                 )}
                 {isSubmitted && isCorrect && (
                   <CheckCircle2
-                    className="w-5 h-5 text-emerald-600"
+                    className="w-4 h-4 text-success-600"
                     aria-hidden="true"
                   />
                 )}
                 {isSubmitted && isSelected && !isCorrect && (
                   <XCircle
-                    className="w-5 h-5 text-rose-600"
+                    className="w-4 h-4 text-error-600"
                     aria-hidden="true"
                   />
                 )}
@@ -274,17 +267,17 @@ export function QuestionCard({
 
       {/* Action Row before submission */}
       {!isSubmitted && (
-        <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-gray-100">
-          <p className="text-xs text-gray-400 order-2 sm:order-1">
-            Tip: Press <kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-700 font-mono">1</kbd>–<kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-700 font-mono">4</kbd> or <kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-700 font-mono">A</kbd>–<kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-700 font-mono">D</kbd> to select, <kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-700 font-mono">Enter</kbd> to submit
+        <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-100">
+          <p className="text-xs text-slate-400 order-2 sm:order-1 hidden sm:block">
+            Tip: Press <kbd className="px-1.5 py-0.5 bg-white border border-slate-200 rounded text-slate-700 font-mono">1</kbd>–<kbd className="px-1.5 py-0.5 bg-white border border-slate-200 rounded text-slate-700 font-mono">4</kbd> or <kbd className="px-1.5 py-0.5 bg-white border border-slate-200 rounded text-slate-700 font-mono">A</kbd>–<kbd className="px-1.5 py-0.5 bg-white border border-slate-200 rounded text-slate-700 font-mono">D</kbd> to select, <kbd className="px-1.5 py-0.5 bg-white border border-slate-200 rounded text-slate-700 font-mono">Enter</kbd> to submit.
           </p>
           <Button
             size="lg"
             onClick={onSubmit}
             disabled={!selectedOptionId}
-            className="w-full sm:w-auto font-semibold shadow-sm order-1 sm:order-2"
+            className="w-full sm:w-auto font-semibold shadow-xs order-1 sm:order-2"
           >
-            Submit Answer
+            <span>Submit Answer</span>
           </Button>
         </div>
       )}

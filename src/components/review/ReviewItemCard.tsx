@@ -77,20 +77,20 @@ export function ReviewItemCard({
       case "needsReview":
         return {
           label: "Needs Review",
-          color: "bg-amber-100 text-amber-900 border-amber-200",
-          icon: <AlertCircle className="w-3.5 h-3.5 text-amber-700" aria-hidden="true" />,
+          color: "bg-accent-50 text-accent-800 border-accent-200",
+          icon: <AlertCircle className="w-3.5 h-3.5 text-accent-700" aria-hidden="true" />,
         };
       case "improving":
         return {
           label: `Improving (${successfulRecallCount}/${REVIEW_THRESHOLDS.MASTERED_RECALL_COUNT})`,
-          color: "bg-primary-100 text-primary-900 border-primary-200",
+          color: "bg-primary-50 text-primary-800 border-primary-200",
           icon: <TrendingUp className="w-3.5 h-3.5 text-primary-700" aria-hidden="true" />,
         };
       case "mastered":
         return {
           label: "Mastered",
-          color: "bg-emerald-100 text-emerald-900 border-emerald-200",
-          icon: <Trophy className="w-3.5 h-3.5 text-emerald-700" aria-hidden="true" />,
+          color: "bg-success-50 text-success-800 border-success-200",
+          icon: <Trophy className="w-3.5 h-3.5 text-success-700" aria-hidden="true" />,
         };
     }
   };
@@ -98,21 +98,21 @@ export function ReviewItemCard({
   const statusBadge = getStatusBadge();
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-xs hover:shadow-sm transition-all duration-150 flex flex-col justify-between gap-4">
+    <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs hover:border-slate-300 transition-all flex flex-col justify-between gap-4">
       {/* Top Meta Header: Status & Level/Category Badges */}
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2 flex-wrap">
           {/* Status Badge */}
           <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${statusBadge.color}`}
+            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold border ${statusBadge.color}`}
           >
             {statusBadge.icon}
             <span>{statusBadge.label}</span>
           </span>
 
           {/* CEFR Level & Category */}
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-            <CategoryIcon name={categoryIconName} className="w-3 h-3 text-gray-500" />
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+            <CategoryIcon name={categoryIconName} className="w-3 h-3 text-slate-500" />
             <span>{vocabularyItem.level}</span>
             <span>•</span>
             <span>{categoryLabel}</span>
@@ -121,10 +121,10 @@ export function ReviewItemCard({
 
         {/* Last Attempted Timestamp */}
         <span
-          className="text-xs text-gray-400 inline-flex items-center gap-1"
+          className="text-xs text-slate-400 inline-flex items-center gap-1 font-medium"
           title={`Last attempted ${new Date(lastAttemptedAt).toLocaleString()}`}
         >
-          <Clock className="w-3 h-3" aria-hidden="true" />
+          <Clock className="w-3 h-3 text-slate-400" aria-hidden="true" />
           <span>{formatRelativeTime(lastAttemptedAt)}</span>
         </span>
       </div>
@@ -133,11 +133,11 @@ export function ReviewItemCard({
       <div className="space-y-1">
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-baseline gap-2 flex-wrap">
-            <span className="text-xl sm:text-2xl font-bold text-gray-900 font-serif">
+            <span className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
               {displayGerman}
             </span>
-            <span className="text-gray-400 font-light">—</span>
-            <span className="text-base sm:text-lg text-primary-800 font-medium">
+            <span className="text-slate-400 font-light">—</span>
+            <span className="text-base sm:text-lg text-primary-800 font-semibold">
               {vocabularyItem.english}
             </span>
           </div>
@@ -148,10 +148,10 @@ export function ReviewItemCard({
               type="button"
               onClick={() => onSpeak(displayGerman)}
               disabled={isSpeaking}
-              className={`p-2 rounded-lg transition-colors cursor-pointer shrink-0 ${
+              className={`p-2 rounded-lg transition-colors cursor-pointer border shrink-0 ${
                 isWordSpeaking
-                  ? "bg-primary-600 text-white animate-pulse"
-                  : "text-gray-400 hover:text-primary-600 hover:bg-primary-50"
+                  ? "bg-primary-700 text-white border-primary-700"
+                  : "text-slate-500 bg-white border-slate-200 hover:text-primary-800 hover:bg-slate-50"
               }`}
               title={`Listen to ${displayGerman}`}
               aria-label={`Listen to ${displayGerman}`}
@@ -163,9 +163,9 @@ export function ReviewItemCard({
 
         {/* Clinical Example Sentence */}
         {vocabularyItem.exampleGerman && (
-          <div className="mt-2.5 p-3 rounded-lg bg-slate-50 border border-slate-100 text-xs sm:text-sm">
+          <div className="mt-2.5 p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs sm:text-sm">
             <div className="flex items-start justify-between gap-2">
-              <p className="font-serif italic text-slate-800 font-medium leading-relaxed">
+              <p className="text-slate-800 font-semibold leading-relaxed">
                 &ldquo;{vocabularyItem.exampleGerman}&rdquo;
               </p>
               {speechSupported && (
@@ -173,8 +173,8 @@ export function ReviewItemCard({
                   type="button"
                   onClick={() => onSpeak(vocabularyItem.exampleGerman)}
                   disabled={isSpeaking}
-                  className={`p-1 rounded text-slate-400 hover:text-primary-700 transition-colors cursor-pointer shrink-0 ${
-                    isSentenceSpeaking ? "text-primary-700 font-bold" : ""
+                  className={`p-1 rounded transition-colors cursor-pointer shrink-0 ${
+                    isSentenceSpeaking ? "text-primary-800 font-bold" : "text-slate-400 hover:text-primary-800"
                   }`}
                   title="Listen to clinical sentence"
                   aria-label="Listen to clinical sentence"
@@ -192,18 +192,35 @@ export function ReviewItemCard({
         )}
       </div>
 
-      {/* Learning Metrics and History */}
-      <div className="pt-2 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-        <div className="flex items-center gap-3 text-gray-500">
-          <span>
-            Missed: <strong className="text-gray-800">{mistakeCount}x</strong>
-          </span>
-          <span>•</span>
-          <span>
-            Successful recall:{" "}
-            <strong className="text-emerald-700">
-              {successfulRecallCount} / {REVIEW_THRESHOLDS.MASTERED_RECALL_COUNT}
-            </strong>
+      {/* 4-Pip Recall Mastery Stepped Indicator */}
+      <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5" title={`${successfulRecallCount} of 4 successful recalls for mastery`}>
+            <span className="text-slate-500 font-medium">Recall:</span>
+            <div className="flex items-center gap-1">
+              {[1, 2, 3, 4].map((step) => {
+                const filled = successfulRecallCount >= step;
+                return (
+                  <span
+                    key={step}
+                    className={`w-2.5 h-2.5 rounded-full border ${
+                      filled
+                        ? status === "mastered"
+                        : "bg-primary-700 border-primary-700"
+                    }`}
+                  />
+                );
+              })}
+            </div>
+            <span className="text-slate-600 font-semibold tabular-nums ml-1">
+              {successfulRecallCount}/4
+            </span>
+          </div>
+
+          <span className="text-slate-300">•</span>
+
+          <span className="text-slate-500">
+            Missed: <strong className="text-slate-800">{mistakeCount}x</strong>
           </span>
         </div>
 
@@ -213,17 +230,17 @@ export function ReviewItemCard({
             <button
               type="button"
               onClick={() => onReviewSingle(record)}
-              className="text-xs text-primary-700 hover:text-primary-800 font-semibold px-2 py-1 rounded hover:bg-primary-50 transition-colors inline-flex items-center gap-1 cursor-pointer"
+              className="text-xs text-primary-800 hover:text-primary-900 font-semibold px-2 py-1 rounded bg-primary-50 border border-primary-200/80 hover:bg-primary-100 transition-colors inline-flex items-center gap-1 cursor-pointer"
             >
-              <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-              <span>Review word</span>
+              <Sparkles className="w-3 h-3 text-primary-700" aria-hidden="true" />
+              <span>Practice Word</span>
             </button>
           )}
 
           <button
             type="button"
             onClick={() => onRemove(itemId)}
-            className="text-xs text-gray-400 hover:text-rose-600 px-2 py-1 rounded hover:bg-rose-50 transition-colors inline-flex items-center gap-1 cursor-pointer"
+            className="text-xs text-slate-400 hover:text-error-700 px-2 py-1 rounded hover:bg-error-50 transition-colors inline-flex items-center gap-1 cursor-pointer"
             title="Remove from review list"
             aria-label={`Remove ${vocabularyItem.german} from review list`}
           >
@@ -235,9 +252,9 @@ export function ReviewItemCard({
 
       {/* Contextual Note about previous mistake if helpful */}
       {incorrectAnswer && incorrectAnswer !== "No answer" && (
-        <div className="text-[11px] text-gray-500 bg-gray-50 px-2.5 py-1.5 rounded border border-gray-100">
-          Last missed with: <s className="text-rose-600">{incorrectAnswer}</s>{" "}
-          → Correct: <strong className="text-emerald-700">{correctAnswer}</strong>
+        <div className="text-[11px] text-slate-600 bg-slate-50 px-2.5 py-1.5 rounded-md border border-slate-200">
+          Previously missed: <s className="text-error-700">{incorrectAnswer}</s>{" "}
+          → Correct: <strong className="text-success-800">{correctAnswer}</strong>
         </div>
       )}
     </div>

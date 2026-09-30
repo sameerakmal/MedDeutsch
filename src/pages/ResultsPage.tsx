@@ -9,11 +9,11 @@ export function ResultsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="border-b border-gray-200 pb-5">
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+      <div className="border-b border-slate-200 pb-5">
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
           Quiz Results
         </h1>
-        <p className="text-sm text-gray-600 mt-1 max-w-2xl">
+        <p className="text-sm text-slate-600 mt-1 max-w-2xl">
           Overview of your practice quizzes, accuracy rates, and clinical recall performance.
         </p>
       </div>
@@ -21,60 +21,60 @@ export function ResultsPage() {
       {hasResults ? (
         <div className="space-y-6">
           {/* Key Quiz Metrics Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
             <Card className="p-4">
-              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                 Quizzes Completed
               </span>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-2xl font-bold text-slate-900 mt-1">
                 {progress.totalPracticeSessions}
               </p>
             </Card>
 
             <Card className="p-4">
-              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                 Accuracy
               </span>
-              <p className="text-2xl font-bold text-primary-700 mt-1">
+              <p className="text-2xl font-bold text-primary-800 mt-1">
                 {accuracy}%
               </p>
             </Card>
 
             <Card className="p-4">
-              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                 Questions Answered
               </span>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-2xl font-bold text-slate-900 mt-1">
                 {progress.totalQuestionsAttempted}
               </p>
             </Card>
 
             <Card className="p-4">
-              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                 Correct Answers
               </span>
-              <p className="text-2xl font-bold text-emerald-700 mt-1">
+              <p className="text-2xl font-bold text-success-700 mt-1">
                 {progress.totalCorrectAnswers}
               </p>
             </Card>
           </div>
 
           {/* Action Card */}
-          <Card className="p-6 bg-gradient-to-r from-primary-50/50 via-white to-white border-primary-200">
+          <Card className="p-5 sm:p-6 border-slate-200 bg-white">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-lg font-semibold text-gray-900">
-                  Ready for another practice round?
+                <h2 className="text-base sm:text-lg font-bold text-slate-900">
+                  Ready for another practice quiz?
                 </h2>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-xs sm:text-sm text-slate-600 mt-1">
                   Test articles, translations, and clinical sentence completions across all medical categories.
                 </p>
               </div>
               <div className="flex items-center gap-3 shrink-0">
                 <Link to="/practice">
-                  <Button size="md">
+                  <Button size="md" className="font-semibold shadow-xs">
                     <PenLine className="w-4 h-4 mr-1.5" aria-hidden="true" />
-                    <span>Start Practice Quiz</span>
+                    <span>Start Quiz</span>
                   </Button>
                 </Link>
                 <Link to="/review">
@@ -89,19 +89,19 @@ export function ResultsPage() {
 
           {/* Recent Quiz Sessions Activity */}
           {progress.recentActivity.filter((a) => a.type === "practice").length > 0 && (
-            <Card className="p-5">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-700 mb-3 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-primary-600" aria-hidden="true" />
-                <span>Recent Practice Sessions</span>
+            <Card className="p-5 border-slate-200">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-primary-700" aria-hidden="true" />
+                <span>Recent Quiz Sessions</span>
               </h2>
-              <ul className="divide-y divide-gray-100">
+              <ul className="divide-y divide-slate-100">
                 {progress.recentActivity
                   .filter((a) => a.type === "practice")
                   .slice(0, 5)
                   .map((act) => (
                     <li key={act.id} className="py-2.5 flex items-center justify-between text-sm">
-                      <span className="text-gray-800 font-medium">{act.description}</span>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-slate-900 font-semibold">{act.description}</span>
+                      <span className="text-xs text-slate-500 font-medium">
                         {new Date(act.timestamp).toLocaleDateString(undefined, {
                           month: "short",
                           day: "numeric",
@@ -114,20 +114,20 @@ export function ResultsPage() {
           )}
         </div>
       ) : (
-        <Card className="py-12 sm:py-16 px-6 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-primary-100 text-primary-600 flex items-center justify-center mx-auto mb-4 ring-8 ring-primary-50">
-            <BarChart3 className="w-7 h-7" aria-hidden="true" />
+        <Card className="py-12 sm:py-16 px-6 text-center border-slate-200 bg-white">
+          <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 flex items-center justify-center mx-auto mb-3">
+            <BarChart3 className="w-6 h-6" aria-hidden="true" />
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-1.5">
-            No quiz results yet
+          <h2 className="text-xl font-bold text-slate-900 mb-1.5">
+            No Quiz Results Yet
           </h2>
-          <p className="text-sm text-gray-500 max-w-md mx-auto mb-6 leading-relaxed">
+          <p className="text-sm text-slate-600 max-w-md mx-auto mb-6 leading-relaxed">
             Complete a practice quiz to view your accuracy, question breakdown, and learning performance here.
           </p>
           <Link to="/practice">
-            <Button size="lg">
+            <Button size="lg" className="font-semibold shadow-xs">
               <PenLine className="w-4 h-4 mr-1.5" aria-hidden="true" />
-              <span>Start Practice Quiz</span>
+              <span>Start First Quiz</span>
               <ArrowRight className="w-4 h-4 ml-1.5" aria-hidden="true" />
             </Button>
           </Link>
