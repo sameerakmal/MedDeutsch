@@ -122,7 +122,7 @@ export function LearningSetup({
               Essential body parts, basic symptoms, hospital objects, and simple phrases for Indian nurses starting their German journey.
             </p>
             <p className="text-xs text-primary-700 font-medium mt-3">
-              {getCategoryCount("all")} words available in A1
+              {vocabulary.filter((item) => item.level === "A1").length} words available in A1
             </p>
           </button>
 

@@ -149,7 +149,7 @@ export function PracticeSetup({
             aria-pressed={level === "A2"}
           >
             <div className="flex items-center justify-between mb-1.5">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-secondary-100 text-secondary-800">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-accent-100 text-accent-900">
                 Level A2
               </span>
               {level === "A2" && (

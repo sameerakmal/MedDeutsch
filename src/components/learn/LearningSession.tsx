@@ -52,10 +52,11 @@ export function LearningSession({
   // Keyboard navigation support: Left / Right arrows, Space to speak
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't trigger if user is interacting with form inputs (if any)
+      // Don't trigger if user is interacting with form inputs or buttons
       if (
         document.activeElement?.tagName === "INPUT" ||
-        document.activeElement?.tagName === "TEXTAREA"
+        document.activeElement?.tagName === "TEXTAREA" ||
+        document.activeElement?.tagName === "BUTTON"
       ) {
         return;
       }

@@ -25,6 +25,7 @@ const sizeClasses: Record<ButtonSize, string> = {
 };
 
 export function Button({
+  type = "button",
   variant = "primary",
   size = "md",
   className = "",
@@ -33,6 +34,7 @@ export function Button({
 }: ButtonProps) {
   return (
     <button
+      type={type}
       className={`inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-colors duration-150 disabled:opacity-50 disabled:pointer-events-none ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
       {...rest}
     >

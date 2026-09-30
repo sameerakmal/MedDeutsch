@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   BookOpen,
@@ -5,15 +6,18 @@ import {
   RotateCcw,
   Clock,
   ArrowRight,
+  Trash2,
+  AlertTriangle,
 } from "lucide-react";
 
 import { Card, Button, ProgressBar } from "../components";
 import { useLearnerProgress } from "../hooks";
 import { vocabulary } from "../data/vocabulary";
-import { formatRelativeTime } from "../utils";
+import { formatRelativeTime, resetLearningData } from "../utils";
 
 export function ProgressPage() {
   const { progress, reviewStats, accuracy } = useLearnerProgress();
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   const totalVocab = vocabulary.length;
   const studiedSet = new Set(progress.wordsStudied);
@@ -388,6 +392,59 @@ export function ProgressPage() {
             </Link>
           </div>
         )}
+      </Card>
+
+      {/* 6. Data Management Section */}
+      <Card className="p-6 border-gray-200">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-700">
+              Data Management
+            </h2>
+            <p className="text-xs text-gray-500 mt-1 max-w-md">
+              All learning progress is stored locally in your browser. You can reset your data at any time to start fresh.
+            </p>
+          </div>
+
+          {!showResetConfirm ? (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowResetConfirm(true)}
+              className="text-gray-600 hover:text-rose-600 hover:border-rose-200 shrink-0"
+            >
+              <Trash2 className="w-3.5 h-3.5 mr-1.5" aria-hidden="true" />
+              <span>Reset Learning Data</span>
+            </Button>
+          ) : (
+            <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="flex items-center gap-2 text-rose-800 text-xs font-medium">
+                <AlertTriangle className="w-4 h-4 shrink-0 text-rose-600" aria-hidden="true" />
+                <span>Reset all vocabulary, quiz history, and mistakes?</span>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    resetLearningData();
+                    setShowResetConfirm(false);
+                  }}
+                  className="bg-rose-600 hover:bg-rose-700 text-white focus-visible:ring-rose-500 text-xs py-1 px-2.5"
+                >
+                  Yes, Reset
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowResetConfirm(false)}
+                  className="text-gray-600 text-xs py-1 px-2"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
       </Card>
     </div>
   );

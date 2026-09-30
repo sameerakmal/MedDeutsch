@@ -4,8 +4,8 @@ import { Stethoscope, ArrowRight } from "lucide-react";
 
 export function WelcomePage() {
   return (
-    <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-      <div className="text-center max-w-lg px-4">
+    <div className="flex items-center justify-center min-h-screen bg-surface">
+      <div className="text-center max-w-lg px-4 py-8">
         <div className="mx-auto w-16 h-16 rounded-2xl bg-primary-100 flex items-center justify-center mb-6">
           <Stethoscope className="w-8 h-8 text-primary-600" aria-hidden="true" />
         </div>

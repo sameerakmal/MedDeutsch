@@ -9,7 +9,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { Header } from "../components";
 
 interface NavEntry {
@@ -34,6 +34,17 @@ interface AppLayoutProps {
 export function AppLayout({ children }: AppLayoutProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
+  // Close mobile navigation when Escape key is pressed
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && mobileNavOpen) {
+        setMobileNavOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [mobileNavOpen]);
+
   return (
     <div className="flex flex-col h-screen">
       <Header />
@@ -50,7 +61,9 @@ export function AppLayout({ children }: AppLayoutProps) {
         {/* Mobile nav toggle */}
         <button
           type="button"
-          aria-label={mobileNavOpen ? "Close navigation" : "Open navigation"}
+          aria-label={mobileNavOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={mobileNavOpen}
+          aria-controls="mobile-navigation"
           className="md:hidden fixed bottom-4 right-4 z-50 bg-primary-600 text-white p-3 rounded-full shadow-lg hover:bg-primary-700 transition-colors"
           onClick={() => setMobileNavOpen((prev) => !prev)}
         >
@@ -66,7 +79,8 @@ export function AppLayout({ children }: AppLayoutProps) {
               aria-hidden="true"
             />
             <nav
-              aria-label="Main navigation"
+              id="mobile-navigation"
+              aria-label="Mobile navigation"
               className="md:hidden fixed inset-y-0 left-0 w-64 bg-white z-50 shadow-xl py-4 pt-20"
             >
               <NavList onClick={() => setMobileNavOpen(false)} />

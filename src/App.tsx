@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AppLayout } from "./layouts/AppLayout";
 import {
   WelcomePage,
@@ -29,6 +29,7 @@ export default function App() {
                 <Route path="results" element={<ResultsPage />} />
                 <Route path="review" element={<ReviewPage />} />
                 <Route path="progress" element={<ProgressPage />} />
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Routes>
             </AppLayout>
           }
