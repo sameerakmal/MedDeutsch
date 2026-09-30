@@ -2,7 +2,7 @@
 
 Medical German learning for nursing professionals.
 
-Live Demo: [Add Vercel URL]
+Live Demo: [MedDeutsch](https://med-deutsch-sameerakmal.vercel.app/)
 
 ## Overview
 
